@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Description>Role semantics engine for ASP.NET Core with attribute and dynamic rule modes.</Description>
+    <PackageId>Khaos.Web.Authorization</PackageId>
+    <PackageTags>authorization;roles;aspnetcore;policies</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="buildTransitive\Khaos.Web.Authorization.targets"
+          Pack="true"
+          PackagePath="buildTransitive\"
+          Visible="false" />
+  </ItemGroup>
+
+</Project>
