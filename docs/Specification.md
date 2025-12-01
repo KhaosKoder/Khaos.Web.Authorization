@@ -73,7 +73,7 @@ All checks are case-insensitive on role names.
 
 Example solution structure:
 
-* `App.Authorization.Core`
+* `Khaos.Web.Authorization.Core`
 
   * `RoleRuleKind`
   * `IRoleAuthorizationService`, `RoleAuthorizationService`
@@ -84,7 +84,7 @@ Example solution structure:
     * `RolesAuthorizationFilter`
   * DI extension: `AddRoleAuthorizationCore()`
 
-* `App.Authorization.Dynamic`
+* `Khaos.Web.Authorization.Dynamic`
 
   * Delegates & models:
 
@@ -107,28 +107,28 @@ Example solution structure:
     * `AddDynamicMethodAuthorization(IEnumerable<MethodPermissionRule>)`
     * `UseDynamicMethodAuthorization()`
 
-* `App.Authorization.SampleApi`
+* `Khaos.Web.Authorization.SampleApi`
 
   * ASP.NET Core minimal API / MVC:
 
     * JWT generation endpoint
     * Sample protected endpoints for all modes/semantics
-  * Uses both `App.Authorization.Core` and `App.Authorization.Dynamic`.
+    * Uses both `Khaos.Web.Authorization.Core` and `Khaos.Web.Authorization.Dynamic`.
 
 * Test projects (xUnit + FluentAssertions):
 
-  * `App.Authorization.Core.Tests`
-  * `App.Authorization.Dynamic.Tests`
-  * `App.Authorization.SampleApi.Tests` (integration tests)
+    * `Khaos.Web.Authorization.Core.Tests`
+    * `Khaos.Web.Authorization.Dynamic.Tests`
+    * `Khaos.Web.Authorization.SampleApi.Tests` (integration tests)
 
 ---
 
-# 4. App.Authorization.Core Specification
+# 4. Khaos.Web.Authorization.Core Specification
 
 ## 4.1 RoleRuleKind
 
 ```csharp
-namespace App.Authorization.Core;
+namespace Khaos.Web.Authorization.Core;
 
 public enum RoleRuleKind
 {
@@ -144,7 +144,7 @@ public enum RoleRuleKind
 ```csharp
 using System.Security.Claims;
 
-namespace App.Authorization.Core;
+namespace Khaos.Web.Authorization.Core;
 
 public interface IRoleAuthorizationService
 {
@@ -165,7 +165,7 @@ Implementation:
 ```csharp
 using System.Security.Claims;
 
-namespace App.Authorization.Core;
+namespace Khaos.Web.Authorization.Core;
 
 public sealed class RoleAuthorizationService : IRoleAuthorizationService
 {
@@ -205,6 +205,8 @@ public sealed class RoleAuthorizationService : IRoleAuthorizationService
 }
 ```
 
+    All framework and sample components use `ILogger<T>` for diagnostics. Custom middleware or conditions added later should follow the same pattern to ensure consistent logging.
+
 ## 4.3 IContextAuthorizationCondition
 
 Used for “normal mode” (attribute-driven) to define extra predicate logic via DI.
@@ -213,7 +215,7 @@ Used for “normal mode” (attribute-driven) to define extra predicate logic vi
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
-namespace App.Authorization.Core;
+namespace Khaos.Web.Authorization.Core;
 
 public interface IContextAuthorizationCondition
 {
@@ -234,7 +236,7 @@ Consumers implement this for their custom logic (business hours, headers, etc.).
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace App.Authorization.Core.Mvc;
+namespace Khaos.Web.Authorization.Core.Mvc;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
 public sealed class RolesAuthorizeAttribute : TypeFilterAttribute
@@ -266,7 +268,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace App.Authorization.Core.Mvc;
+namespace Khaos.Web.Authorization.Core.Mvc;
 
 public sealed class RolesAuthorizationFilter : IAsyncAuthorizationFilter
 {
@@ -337,7 +339,7 @@ public sealed class RolesAuthorizationFilter : IAsyncAuthorizationFilter
 ```csharp
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App.Authorization.Core;
+namespace Khaos.Web.Authorization.Core;
 
 public static class ServiceCollectionExtensions
 {
@@ -351,9 +353,20 @@ public static class ServiceCollectionExtensions
 }
 ```
 
+        ### 4.4.4 Registering Condition Types
+
+        Every `conditionType` supplied to `RolesAuthorizeAttribute` must be registered with DI as a service implementing `IContextAuthorizationCondition`. Register each concrete condition as `Scoped` (safe access to request services) or `Transient` if it is stateless. Example:
+
+        ```csharp
+        services.AddScoped<BusinessHoursCondition>();
+        services.AddTransient<GeofencingCondition>();
+        ```
+
+        Failing to register a condition type causes the filter to return `ForbidResult`, so the spec explicitly requires developers to add each condition to `IServiceCollection` during application startup.
+
 ---
 
-# 5. App.Authorization.Dynamic Specification
+# 5. Khaos.Web.Authorization.Dynamic Specification
 
 ## 5.1 Delegates & Models
 
@@ -363,7 +376,7 @@ public static class ServiceCollectionExtensions
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
-namespace App.Authorization.Dynamic;
+namespace Khaos.Web.Authorization.Dynamic;
 
 public delegate ValueTask<bool> PermissionConditionDelegate(
     HttpContext httpContext,
@@ -374,9 +387,9 @@ public delegate ValueTask<bool> PermissionConditionDelegate(
 ### 5.1.2 MethodPermissionRule
 
 ```csharp
-using App.Authorization.Core;
+using Khaos.Web.Authorization.Core;
 
-namespace App.Authorization.Dynamic;
+namespace Khaos.Web.Authorization.Dynamic;
 
 public sealed class MethodPermissionRule
 {
@@ -421,7 +434,7 @@ public sealed class MethodPermissionRule
 ### 5.1.3 MethodKey
 
 ```csharp
-namespace App.Authorization.Dynamic;
+namespace Khaos.Web.Authorization.Dynamic;
 
 public readonly struct MethodKey : IEquatable<MethodKey>
 {
@@ -454,7 +467,7 @@ public readonly struct MethodKey : IEquatable<MethodKey>
 ### 5.2.1 IMethodPermissionStore
 
 ```csharp
-namespace App.Authorization.Dynamic;
+namespace Khaos.Web.Authorization.Dynamic;
 
 public interface IMethodPermissionStore
 {
@@ -465,7 +478,7 @@ public interface IMethodPermissionStore
 ### 5.2.2 InMemoryMethodPermissionStore
 
 ```csharp
-namespace App.Authorization.Dynamic;
+namespace Khaos.Web.Authorization.Dynamic;
 
 public sealed class InMemoryMethodPermissionStore : IMethodPermissionStore
 {
@@ -504,7 +517,7 @@ public sealed class InMemoryMethodPermissionStore : IMethodPermissionStore
 ```csharp
 using Microsoft.AspNetCore.Http;
 
-namespace App.Authorization.Dynamic;
+namespace Khaos.Web.Authorization.Dynamic;
 
 public interface IRequestPermissionEvaluator
 {
@@ -519,11 +532,11 @@ Uses `ControllerActionDescriptor` metadata to determine controller type and meth
 ```csharp
 using System.Reflection;
 using System.Security.Claims;
-using App.Authorization.Core;
+using Khaos.Web.Authorization.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 
-namespace App.Authorization.Dynamic;
+namespace Khaos.Web.Authorization.Dynamic;
 
 public sealed class DefaultRequestPermissionEvaluator : IRequestPermissionEvaluator
 {
@@ -613,7 +626,7 @@ public sealed class DefaultRequestPermissionEvaluator : IRequestPermissionEvalua
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
-namespace App.Authorization.Dynamic;
+namespace Khaos.Web.Authorization.Dynamic;
 
 public sealed class PermissionsAuthorizationMiddleware
 {
@@ -654,7 +667,7 @@ public sealed class PermissionsAuthorizationMiddleware
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace App.Authorization.Dynamic;
+namespace Khaos.Web.Authorization.Dynamic;
 
 public static class DynamicAuthorizationExtensions
 {
@@ -681,7 +694,7 @@ public static class DynamicAuthorizationExtensions
 
 ---
 
-# 6. Sample API Specification (App.Authorization.SampleApi)
+# 6. Sample API Specification (Khaos.Web.Authorization.SampleApi)
 
 ## 6.1 Purpose
 
@@ -730,6 +743,8 @@ public sealed class TokenRequest
 
   * `TokenValidationParameters.RoleClaimType` set to `"role"` or `"roles"`.
   * That resolves to `ClaimTypes.Role` for our core library.
+
+Configuration values such as symmetric keys, issuer, and audience live in `appsettings.json` / `appsettings.Development.json` as plain strings for now. Future hardening (Key Vault, user secrets, etc.) can be layered later without changing the API surface.
 
 ## 6.3 Sample Controllers / Endpoints
 
@@ -795,8 +810,8 @@ Implements `IContextAuthorizationCondition`:
 Example:
 
 ```csharp
-using App.Authorization.Core;
-using App.Authorization.Dynamic;
+using Khaos.Web.Authorization.Core;
+using Khaos.Web.Authorization.Dynamic;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -810,13 +825,13 @@ builder.Services.AddRoleAuthorizationCore();
 var rules = new List<MethodPermissionRule>
 {
     new(
-        typeFullName: "App.Authorization.SampleApi.Controllers.DynamicDemoController",
+        typeFullName: "Khaos.Web.Authorization.SampleApi.Controllers.DynamicDemoController",
         methodName: "ViewOrders",
         ruleKind: RoleRuleKind.AnyOf,
         roles: new[] { "Admin", "Sales" }),
 
     new(
-        typeFullName: "App.Authorization.SampleApi.Controllers.DynamicDemoController",
+        typeFullName: "Khaos.Web.Authorization.SampleApi.Controllers.DynamicDemoController",
         methodName: "CreateOrder",
         ruleKind: RoleRuleKind.AllOf,
         roles: new[] { "Admin", "Sales" },
@@ -827,7 +842,7 @@ var rules = new List<MethodPermissionRule>
         }),
 
     new(
-        typeFullName: "App.Authorization.SampleApi.Controllers.DynamicDemoController",
+        typeFullName: "Khaos.Web.Authorization.SampleApi.Controllers.DynamicDemoController",
         methodName: "DeleteOrder",
         ruleKind: RoleRuleKind.AnyOf,
         roles: new[] { "Admin" },
@@ -840,7 +855,7 @@ var rules = new List<MethodPermissionRule>
         }),
 
     new(
-        typeFullName: "App.Authorization.SampleApi.Controllers.DynamicDemoController",
+        typeFullName: "Khaos.Web.Authorization.SampleApi.Controllers.DynamicDemoController",
         methodName: "GetSensitiveReport",
         ruleKind: RoleRuleKind.NotAnyOf,
         roles: new[] { "Suspended", "Blacklisted" },
@@ -869,13 +884,17 @@ app.MapControllers();
 app.Run();
 ```
 
+*Controller scope:* `DefaultRequestPermissionEvaluator` only needs to resolve permissions for MVC controller actions via `ControllerActionDescriptor`. Minimal APIs, gRPC endpoints, and other middleware-driven pipelines fall through this component and are treated as allowed.
+
+*Allow-by-default rule:* As reiterated above, if no explicit rule exists for a controller action, the request is allowed even for anonymous users. Only endpoints with at least one rule require authentication.
+
 ---
 
 # 7. Unit Test Specification
 
 Use xUnit + FluentAssertions.
 
-## 7.1 App.Authorization.Core.Tests
+## 7.1 Khaos.Web.Authorization.Core.Tests
 
 ### 7.1.1 RoleAuthorizationServiceTests
 
@@ -915,7 +934,7 @@ Focus on combination of:
 
 Use a fake `IContextAuthorizationCondition` which tracks calls and returns a configurable result.
 
-## 7.2 App.Authorization.Dynamic.Tests
+## 7.2 Khaos.Web.Authorization.Dynamic.Tests
 
 ### 7.2.1 InMemoryMethodPermissionStoreTests
 
@@ -964,7 +983,7 @@ Using a mock `IRequestPermissionEvaluator`:
 
 ---
 
-## 7.3 App.Authorization.SampleApi.Tests (Integration)
+## 7.3 Khaos.Web.Authorization.SampleApi.Tests (Integration)
 
 Use `WebApplicationFactory<Program>` to spin up the sample API.
 

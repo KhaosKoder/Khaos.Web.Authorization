@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <KhaosAuthorizationDocsSource>$(MSBuildThisFileDirectory)docs</KhaosAuthorizationDocsSource>
+    <KhaosAuthorizationDocsFolderName>Khaos.Web.Authorization</KhaosAuthorizationDocsFolderName>
+    <KhaosAuthorizationDocsDestination Condition="'$(SolutionDir)' != ''">
+      $(SolutionDir)docs\$(KhaosAuthorizationDocsFolderName)
+    </KhaosAuthorizationDocsDestination>
+  </PropertyGroup>
+
+  <Target Name="KhaosAuthorizationCopyDocs" AfterTargets="Restore" Condition="'$(KhaosAuthorizationDocsDestination)' != '' and Exists('$(KhaosAuthorizationDocsSource)')">
+    <ItemGroup>
+      <_KhaosAuthorizationDoc Include="$(KhaosAuthorizationDocsSource)\**\*" />
+    </ItemGroup>
+    <MakeDir Directories="$(KhaosAuthorizationDocsDestination)" />
+    <Copy SourceFiles="@(_KhaosAuthorizationDoc)"
+          DestinationFiles="@(_KhaosAuthorizationDoc->'$(KhaosAuthorizationDocsDestination)\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>
