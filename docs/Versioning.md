@@ -2,7 +2,7 @@
 
 Khaos.Web.Authorization uses [MinVer](https://github.com/adamralph/minver) to infer semantic versions directly from Git history. No manual edits to `.csproj` files are required.
 
-## Version Source of Truth
+## Version Source of Truth  
 
 * Tags must follow the pattern `Khaos.Web.Authorization/v<semver>` (example: `Khaos.Web.Authorization/v1.2.0`).
 * MinVer walks back through the current commit ancestry looking for the highest matching tag and derives pre-release versions when no tag is present.
