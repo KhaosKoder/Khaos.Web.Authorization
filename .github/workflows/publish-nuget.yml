@@ -3,7 +3,7 @@ name: Publish to NuGet (Trusted Publishing)
 on:
   push:
     tags:
-      - 'v*'                        # e.g. v1.0.0, v1.0.1
+      - 'Khaos.Web.Authorization/v*'   # e.g. v1.0.0, v1.0.1
 
 permissions:
   contents: read
