@@ -11,7 +11,7 @@ Role semantics for ASP.NET Core without hand-rolling policies. Khaos.Web.Authori
 ## Installation
 
 ```powershell
-dotnet add package Khaos.Web.Authorization
+dotnet add package KhaosCode.Web.Authorization
 ```
 
 > Targets .NET 9 (works on .NET 8+). Symbols and docs ship with every release.

@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>Role semantics engine for ASP.NET Core with attribute and dynamic rule modes.</Description>
-    <PackageId>Khaos.Web.Authorization</PackageId>
+    <PackageId>KhaosCode.Web.Authorization</PackageId>
     <PackageTags>authorization;roles;aspnetcore;policies</PackageTags>
   </PropertyGroup>
 
