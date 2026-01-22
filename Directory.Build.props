@@ -4,8 +4,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Authors>KhaosKoder</Authors>
-    <Company>KhaosKoder</Company>
+    <Authors>Khaos</Authors>
+    <Company>Khaos</Company>
     <RepositoryUrl>https://github.com/KhaosKoder/Khaos.Web.Authorization</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/KhaosKoder/Khaos.Web.Authorization</PackageProjectUrl>
