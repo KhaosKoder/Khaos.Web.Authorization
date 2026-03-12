@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>Role semantics engine for ASP.NET Core with attribute and dynamic rule modes.</Description>
-    <PackageId>KhaosCode.Web.Authorization</PackageId>
+    <PackageId>KhaosKode.Web.Authorization</PackageId>
     <PackageTags>authorization;roles;aspnetcore;policies</PackageTags>
   </PropertyGroup>
 
